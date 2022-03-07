@@ -1,6 +1,7 @@
 import logging
 from typing import Dict, List, Tuple, Union
 
+import os
 import cv2
 import numpy as np
 import torch
@@ -77,13 +78,15 @@ def predict(model: Union[FasterRCNN, SSD], x: List[np.ndarray]) -> List[Dict[str
     # This is very important! If values are not in the range as the network was trained with, the predictions will
     # be very bad.
     x_tensor = [tensor / 255 for tensor in x_tensor]
+    #print(np.array(x_tensor).shape)
 
     # The common practice for evaluating/validation is using torch.no_grad() in pair with model.eval() to
     # turn off gradients computation:
     with torch.no_grad():
         # TODO (Task 3): Fill in your code ########################################################
         ##################################################################################
-        predictions: List[Dict[str, torch.Tensor]] = "YOUR CODE HERE"
+        #print(model(x_tensor))
+        predictions: List[Dict[str, torch.Tensor]] = model(x_tensor)
         ##################################################################################
         predictions_np = [{key: value.numpy() for key, value in prediction.items()} for prediction in predictions]
 
@@ -103,22 +106,27 @@ def main() -> None:
     # Make predictions on files stored in the data folder
 
     # 1. List the files in the data folder
-    files: List[str] = "YOUR CODE HERE"
+    files: List[str] = os.listdir("/Users/sigmundhoeg/Library/CloudStorage/OneDrive-NTNU/Personlig/BrainNTNU/WorkshopAI-Cognite-V22/data")
 
     # 2. Read files as numpy arrays
-    images: List[np.ndarray] = [np.array(Image.open(file).convert("RGB")) for file in files]
+    images: List[np.ndarray] = [np.array(Image.open("/Users/sigmundhoeg/Library/CloudStorage/OneDrive-NTNU/Personlig/BrainNTNU/WorkshopAI-Cognite-V22/data/"+ file).convert("RGB")) for file in files]
 
     # 3. Reshape all images to what the torchvision models expect [Channel, Height, Width].
     images = [np.moveaxis(image, -1, 0) for image in images]
 
     # 4. Load model
-    model = "YOUR CODE HERE"
+    model = get_fasterrcnn_model()
 
     # 5. Make predictions
-    result: List[Dict[str, np.ndarray]] = "YOUR CODE HERE"
-
+    result: List[Dict[str, np.ndarray]] = predict(model, images)
+    #print(result)
     # 6. Print results
     logger.info("Listing predictions")
+    for res in result:
+        #print(res.keys)
+        for label, score in zip(res["labels"], res["scores"]):
+            if score > 0.7:
+                print(coco_labels[label], score)
     ##################################################################################
 
 

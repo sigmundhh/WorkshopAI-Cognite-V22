@@ -1,5 +1,7 @@
 from djitellopy import Tello
 
+import time
+
 
 def main() -> None:
     tello = Tello()
@@ -10,8 +12,10 @@ def main() -> None:
             print(f"Running {cmd} command")
             # TODO (Task 1): Fill in your code ########################################################
             ##################################################################################
-
+            tello.takeoff()
             ##################################################################################
+            if tello.is_flying:
+                tello.land()
     except Exception as e:
         print(e)
     finally:

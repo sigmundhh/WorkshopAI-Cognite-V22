@@ -7,7 +7,7 @@ import pygame
 from djitellopy import BackgroundFrameRead, Tello
 from torchvision.models.detection import SSD
 
-from brain_ntnu_workshop_ai_2022.workshop.object_detection import add_bounding_box_to_frame
+from brain_ntnu_workshop_ai_2022.workshop.object_detection import add_bounding_box_to_frame, get_ssdlite_model, predict
 
 # Speed of the drone
 SPEED = 60
@@ -52,12 +52,13 @@ class FrontEnd(object):
         self.up_down_velocity = 0
         self.yaw_velocity = 0
         self.speed = 10
+        self.im_count = 0
 
         self.send_rc_control = False
 
         # TODO (Task 3): Fill in your code ########################################################
         ##################################################################################
-        self.model: SSD = None
+        self.model: SSD = get_ssdlite_model()
         ##################################################################################
 
         # Create update timer
@@ -113,7 +114,7 @@ class FrontEnd(object):
             # TODO(Task 3): Fill in your code ########################################################
             ##################################################################################
             # Remove the comment to run the prediction on each frame.
-            # self.predict_frame()
+            #self.predict_frame()
             ##################################################################################
 
             self.frame = self.flip_frame(self.frame)
@@ -129,11 +130,11 @@ class FrontEnd(object):
 
     def predict_frame(self) -> None:
         frame_reshaped = np.moveaxis(self.frame, -1, 0)  # This reshapes the frame to fit for the torchvision models
-
+        #print("frame_reashaped.shape", frame_reshaped.shape)
         # TODO(Task 3): Fill in your code ########################################################
         ##################################################################################
         # Make predictions using predict method from workshop/object_detection.py
-        predictions: List[Dict[str, np.ndarray]] = "YOUR CODE HERE"
+        predictions: List[Dict[str, np.ndarray]] = predict(self.model, [frame_reshaped])
         ##################################################################################
 
         # Visualize the bounding boxes if score is bigger than a threshold
@@ -196,6 +197,9 @@ class FrontEnd(object):
         # TODO (Task 4): Fill in your code ########################################################
         ##################################################################################
         # Save frame to file when SPACE is pressed
+        elif key == pygame.K_SPACE:
+            cv2.imwrite("/Users/sigmundhoeg/Library/CloudStorage/OneDrive-NTNU/Personlig/BrainNTNU/WorkshopAI-Cognite-V22/data/img" + str(self.im_count) +".jpg", self.frame)
+            self.im_count += 1
         ##################################################################################
 
     def update(self) -> None:

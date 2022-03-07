@@ -38,7 +38,9 @@ def main() -> None:
     # TODO (Task 6): Fill in your code ########################################################
     ##################################################################################
     # List all the image files in the data folder similar to this ["data/img1.png", "data/img2.png",...]
-    files: List[str] = "<YOUR CODE HERE>"
+    files: List[str] = os.listdir("/Users/sigmundhoeg/Library/CloudStorage/OneDrive-NTNU/Personlig/BrainNTNU/WorkshopAI-Cognite-V22/data")
+    files = [file + "/Users/sigmundhoeg/Library/CloudStorage/OneDrive-NTNU/Personlig/BrainNTNU/WorkshopAI-Cognite-V22/data/" for  file in files]
+
     ##################################################################################
 
     # For each file add a FileMetadata object to the upload queue
